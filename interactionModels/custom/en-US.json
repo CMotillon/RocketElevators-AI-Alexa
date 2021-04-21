@@ -1,0 +1,132 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "rocket elevators",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "OptionsIntent",
+          "slots": [],
+          "samples": [
+            "I don\u0027t know",
+            "options",
+            "What are my options"
+          ]
+        },
+        {
+          "name": "RocketElevatorsStatusReportIntent",
+          "slots": [],
+          "samples": [
+            "summary",
+            "status update",
+            "rocket elevators status update",
+            "what is going on at rocket elevators",
+            "what\u0027s going on at rocket elevators"
+          ]
+        },
+        {
+          "name": "ElevatorStatusIntent",
+          "slots": [
+            {
+              "name": "id",
+              "type": "AMAZON.NUMBER",
+              "samples": [
+                "elevator number {id}",
+                "elevator ID {id}",
+                "ID {id}",
+                "{id}"
+              ]
+            }
+          ],
+          "samples": [
+            "id {id}",
+            "elevator",
+            "elevator number {id}",
+            "elevator id {id}",
+            "elevator {id}",
+            "i. d. {id}",
+            "what\u0027s the status of elevator {id}",
+            "status of elevator {id}",
+            "elevator {id} status",
+            "what is the status of elevator {id}"
+          ]
+        }
+      ],
+      "types": []
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "ElevatorStatusIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "id",
+              "type": "AMAZON.NUMBER",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1321849477768.477817730626"
+              },
+              "validations": [
+                {
+                  "type": "isGreaterThan",
+                  "prompt": "Slot.Validation.1321849477768.477817730626.269827896687",
+                  "value": "0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RocketElevatorsStatusReportIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": []
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.1321849477768.477817730626",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What is the ID of the elevator you would like the status of?"
+          }
+        ]
+      },
+      {
+        "id": "Slot.Validation.1321849477768.477817730626.269827896687",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Please specify and ID greater than zero."
+          }
+        ]
+      }
+    ]
+  },
+  "version": "11"
+}
