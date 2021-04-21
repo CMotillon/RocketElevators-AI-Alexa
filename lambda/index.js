@@ -20,41 +20,41 @@ const LaunchRequestHandler = {
 };
 
 const GetRemoteDataHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'LaunchRequest'
-      || (handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'GetRemoteDataIntent');
-  },
-  async handle(handlerInput) {
-    let outputSpeech = 'This is the default message.';
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'LaunchRequest'
+            || (handlerInput.requestEnvelope.request.type === 'IntentRequest'
+                && handlerInput.requestEnvelope.request.intent.name === 'GetRemoteDataIntent');
+    },
+    async handle(handlerInput) {
+        let outputSpeech = 'This is the default message.';
 
-    await getRemoteData('http://api.open-notify.org/astros.json')
-      .then((response) => {
-        const data = JSON.parse(response);
-        outputSpeech = `There are currently ${data.people.length} astronauts in space. `;
-        for (let i = 0; i < data.people.length; i += 1) {
-          if (i === 0) {
-            // first record
-            outputSpeech = `${outputSpeech}Their names are: ${data.people[i].name}, `;
-          } else if (i === data.people.length - 1) {
-            // last record
-            outputSpeech = `${outputSpeech}and ${data.people[i].name}.`;
-          } else {
-            // middle record(s)
-            outputSpeech = `${outputSpeech + data.people[i].name}, `;
-          }
-        }
-      })
-      .catch((err) => {
-        console.log(`ERROR: ${err.message}`);
-        // set an optional error message here
-        // outputSpeech = err.message;
-      });
+        await getRemoteData('http://api.open-notify.org/astros.json')
+            .then((response) => {
+                const data = JSON.parse(response);
+                outputSpeech = `There are currently ${data.people.length} astronauts in space. `;
+                for (let i = 0; i < data.people.length; i += 1) {
+                    if (i === 0) {
+                        // first record
+                        outputSpeech = `${outputSpeech}Their names are: ${data.people[i].name}, `;
+                    } else if (i === data.people.length - 1) {
+                        // last record
+                        outputSpeech = `${outputSpeech}and ${data.people[i].name}.`;
+                    } else {
+                        // middle record(s)
+                        outputSpeech = `${outputSpeech + data.people[i].name}, `;
+                    }
+                }
+            })
+            .catch((err) => {
+                console.log(`ERROR: ${err.message}`);
+                // set an optional error message here
+                // outputSpeech = err.message;
+            });
 
-    return handlerInput.responseBuilder
-      .speak(outputSpeech)
-      .getResponse();
-  },
+        return handlerInput.responseBuilder
+            .speak(outputSpeech)
+            .getResponse();
+    },
 };
 
 const OptionsIntentHandler = {
@@ -77,8 +77,21 @@ const ElevatorStatusIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ElevatorStatusIntent';
     },
-    handle(handlerInput) {
-        const speakOutput = `The status of Elevator 1 is offline`;
+    async handle(handlerInput) {
+        let elevatorID = handlerInput.requestEnvelope.request.intent.slots.id.value;
+        console.log(elevatorID);
+        let speakOutput = `Elevator ${elevatorID} is in an `;
+
+        await getRemoteData(`https://rocket-elevators-rest-apii.herokuapp.com/elevators/${elevatorID}/status`)
+            .then((response) => {
+                const data = response;
+                speakOutput += `${data} status.`;
+            })
+            .catch((err) => {
+                console.log(`ERROR: ${err.message}`);
+                // set an optional error message here
+                speakOutput = err.message;
+            });
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -219,16 +232,16 @@ const ErrorHandler = {
  * Used to make the API calls
  * */
 const getRemoteData = (url) => new Promise((resolve, reject) => {
-  const client = url.startsWith('https') ? require('https') : require('http');
-  const request = client.get(url, (response) => {
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      reject(new Error(`Failed with status code: ${response.statusCode}`));
-    }
-    const body = [];
-    response.on('data', (chunk) => body.push(chunk));
-    response.on('end', () => resolve(body.join('')));
-  });
-  request.on('error', (err) => reject(err));
+    const client = url.startsWith('https') ? require('https') : require('http');
+    const request = client.get(url, (response) => {
+        if (response.statusCode < 200 || response.statusCode > 299) {
+            reject(new Error(`Failed with status code: ${response.statusCode}`));
+        }
+        const body = [];
+        response.on('data', (chunk) => body.push(chunk));
+        response.on('end', () => resolve(body.join('')));
+    });
+    request.on('error', (err) => reject(err));
 });
 
 /**
