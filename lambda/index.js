@@ -79,7 +79,7 @@ const ElevatorStatusIntentHandler = {
     },
     async handle(handlerInput) {
         let elevatorID = handlerInput.requestEnvelope.request.intent.slots.id.value;
-        console.log(elevatorID);
+        // console.log(elevatorID);
         let speakOutput = `Elevator ${elevatorID} is in an `;
 
         await getRemoteData(`https://rocket-elevators-rest-apii.herokuapp.com/elevators/${elevatorID}/status`)
@@ -105,12 +105,19 @@ const RocketElevatorsStatusReportIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RocketElevatorsStatusReportIntent';
     },
-    handle(handlerInput) {
-        let speakOutput = `Greetings. There are currently 100 elevators deployed in the 100 buildings of your 100 customers. `;
-        speakOutput += `Currently, 100 elevators are not in Running Status and are being serviced. `;
-        speakOutput += `100 batteries are deployed across 100 cities. `;
-        speakOutput += `On another note, you currently have 100 quotes awaiting processing. `;
-        speakOutput += `You also have 100 leads in your contact requests.`;
+    async handle(handlerInput) {
+        let speakOutput = ``;
+
+        await getRemoteData(`https://rocket-elevators-rest-apii.herokuapp.com/summary`)
+            .then((response) => {
+                const data = response;
+                speakOutput += `${data}`;
+            })
+            .catch((err) => {
+                console.log(`ERROR: ${err.message}`);
+                // set an optional error message here
+                speakOutput = err.message;
+            });
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -160,7 +167,7 @@ const FallbackIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
     },
     handle(handlerInput) {
-        const speakOutput = 'Sorry, I don\'t know about that. Please try again.';
+        const speakOutput = 'Sorry, I didn\'t get that. Please try again.';
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
