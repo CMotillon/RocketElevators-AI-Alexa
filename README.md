@@ -1,6 +1,6 @@
 # Rocket Elevators AI with Alexa
 
-## How Alexa Skill Works
+## How Alexa Skills Work
 
 An Alexa skill has both an interaction model—or voice user interface—and application logic. When a customer speaks, Alexa processes the speech in the context of your interaction model to determine the customer request. Alexa then sends the request to your skill application logic, which acts on it. You provide your application logic as a back-end cloud service hosted by Alexa, AWS, or another server.
 
